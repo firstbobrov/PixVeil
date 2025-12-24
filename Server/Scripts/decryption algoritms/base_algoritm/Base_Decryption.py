@@ -13,7 +13,7 @@ flag = True
 c = height * width
 for y in range(height):
     for x in range(width):
-#!!!
+#!!! доработать оптимизацию
         if len(extracted_bytes) == c:
             break
         if pixel_matrix[y, x, 1] % 2 == 0:
@@ -29,7 +29,7 @@ for y in range(height):
 
 # Шаг 3: Преобразование списка байтов в bytes и декодирование как UTF-8
 message_bytes = bytes(extracted_bytes)
-decoded_message = message_bytes.decode('utf-8', errors='ignore')  # Игнорируем ошибки, если есть
+decoded_message = message_bytes.decode('utf-8', errors='ignore')
 
 print("Восстановленное сообщение:")
 print(decoded_message)

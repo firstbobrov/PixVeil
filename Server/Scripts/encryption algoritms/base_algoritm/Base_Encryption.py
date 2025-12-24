@@ -2,10 +2,10 @@ from PIL import Image
 import numpy as np
 
 # Шаг 1: Входное сообщение
-message = input('сообщение: ')  # Замените на реальное сообщение
+message = input('сообщение: ')
 
-# Шаг 2: Преобразование сообщения в массив чисел (байтов 0-255)
-# Используем UTF-8 для поддержки русского, английского и других символов
+# Шаг 2: Преобразование сообщения в массив чисел (0-255)
+# Используем UTF-8
 message_bytes = message.encode('utf-8')
 message_array = np.frombuffer(message_bytes, dtype=np.uint8)
 
@@ -16,7 +16,7 @@ pixel_matrix = np.array(img)  # Форма: (height, width, 3) для RGB
 
 # Шаг 4: Проход по пикселям и запись в красный канал только если подходит (±10)
 # Для подходящих: записать в red, сделать green и blue чётными
-# Для неподходящих: сделать green и blue нечётными (используем | 1)
+# Для неподходящих: сделать green и blue нечётными
 height, width, _ = pixel_matrix.shape
 msg_index = 0
 flag = True
@@ -29,7 +29,7 @@ for y in range(height):
         target = message_array[msg_index]
         current_red = pixel_matrix[y, x, 0]
         
-#!!!
+#!!! доработать оптимизацию
         if flag:
             if abs(int(current_red) - len(message_array)) <= 10:
                 # Подходит: записываем в red, делаем g и b чётными
