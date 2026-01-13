@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}PixVeil - Руководство пользователя{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold">Руководство пользователя</h1>
+            <p class="lead text-muted">Подробная инструкция по использованию сервиса PixVeil</p>
+        </div>
+
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0"><i class="bi bi-stars me-2"></i>Возможности сервиса</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success me-2"></i>Скрытие текстовых сообщений внутри изображений</li>
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success me-2"></i>Извлечение сообщений из зашифрованных изображений</li>
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success me-2"></i>Поддержка нескольких алгоритмов шифрования</li>
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success me-2"></i>Дополнительная защита с помощью секретных ключей</li>
+                    <li class="list-group-item"><i class="bi bi-check-circle text-success me-2"></i>Простой и интуитивно понятный интерфейс</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-success">
+            <div class="card-header bg-success text-white">
+                <h2 class="h4 mb-0"><i class="bi bi-lock me-2"></i>Шифрование данных</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-1-circle display-4 text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Выберите режим и алгоритм</h4>
+                        <p>Переключитесь в режим шифрования и выберите подходящий алгоритм из списка. Для большинства случаев подойдет алгоритм "Групбокс".</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-2-circle display-4 text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Загрузите изображение</h4>
+                        <p>Нажмите кнопку выбора файла и загрузите изображение в формате PNG или JPG. Рекомендуется использовать изображения с высоким разрешением для лучшего качества.</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-3-circle display-4 text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Введите сообщение</h4>
+                        <p>Напишите текст, который нужно зашифровать. Максимальная длина зависит от размера изображения и выбранного алгоритма.</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-4-circle display-4 text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Получите результат</h4>
+                        <p>После обработки вы увидите зашифрованное изображение, которое можно скачать или скопировать для передачи получателю.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h2 class="h4 mb-0"><i class="bi bi-unlock me-2"></i>Дешифрование данных</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-1-circle display-4 text-info"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Выберите режим и алгоритм</h4>
+                        <p>Переключитесь в режим дешифрования. Убедитесь, что выбран тот же алгоритм, который использовался при шифровании.</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-2-circle display-4 text-info"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Загрузите изображение</h4>
+                        <p>Загрузите зашифрованное изображение, полученное от отправителя. Убедитесь, что файл не был изменен после шифрования.</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-3-circle display-4 text-info"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Укажите ключ (если требуется)</h4>
+                        <p>Если при шифровании использовался секретный ключ, введите его в соответствующее поле. Для алгоритма "Групбокс" ключ не требуется.</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="bg-light p-3 rounded-circle d-inline-block">
+                            <i class="bi bi-4-circle display-4 text-info"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4>Получите сообщение</h4>
+                        <p>После обработки вы увидите исходное сообщение, которое было зашифровано в изображении.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-warning">
+            <div class="card-header bg-warning">
+                <h2 class="h4 mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Важные замечания</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><i class="bi bi-filetype-png text-warning me-2"></i>Сервис поддерживает только изображения в форматах PNG и JPG</li>
+                    <li class="list-group-item"><i class="bi bi-aspect-ratio text-warning me-2"></i>Качество шифрования зависит от размера и сложности изображения</li>
+                    <li class="list-group-item"><i class="bi bi-key text-warning me-2"></i>Секретный ключ значительно повышает безопасность зашифрованных данных</li>
+                    <li class="list-group-item"><i class="bi bi-cloud-download text-warning me-2"></i>Всегда сохраняйте оригинальное изображение перед шифрованием</li>
+                    <li class="list-group-item"><i class="bi bi-shield-check text-warning me-2"></i>Для максимальной безопасности используйте разные алгоритмы для разных сообщений</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-lg btn-primary">
+                <i class="bi bi-arrow-left me-2"></i>Вернуться на главную страницу
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
