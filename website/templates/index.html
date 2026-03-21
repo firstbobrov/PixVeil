@@ -5,16 +5,17 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold">Защита данных в изображениях</h1>
-            <p class="lead text-muted">Надежное шифрование и дешифрование информации с помощью современных алгоритмов</p>
+        <div class="text-center mb-4 mb-md-5">
+            <h1 class="fw-bold" style="font-size: 2.5rem;">Защита данных в изображениях</h1>
+            <p class="text-muted" style="font-size: 1.1rem;">Надежное шифрование и дешифрование информации с помощью современных алгоритмов</p>
         </div>
 
+        <!-- Переключатели режимов -->
         <div class="mb-4">
-            <label class="form-label fw-bold">Режим работы:</label>
-            <div class="d-flex gap-3">
+            <label class="form-label">Режим работы:</label>
+            <div class="d-flex gap-3 flex-wrap">
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="mode" id="encrypt-mode" value="encrypt" 
+                    <input class="form-check-input" type="radio" name="mode" id="encrypt-mode" value="encrypt"
                         {% if mode == 'encrypt' or not mode %}checked{% endif %}>
                     <label class="form-check-label" for="encrypt-mode">
                         <i class="bi bi-lock me-1"></i>Шифрование
@@ -31,48 +32,47 @@
         </div>
 
         <!-- Форма шифрования -->
-        <div id="encrypt-section" class="mode-section p-4 border rounded bg-white shadow-sm" 
+        <div id="encrypt-section" class="mode-section card p-3 p-md-4"
              style="display: {% if mode == 'encrypt' or not mode %}block{% else %}none{% endif %};">
-            <h3 class="mb-4 text-center"><i class="bi bi-lock me-2"></i>Шифрование данных</h3>
+            <h3 class="mb-4 text-center fs-4"><i class="bi bi-lock me-2"></i>Шифрование данных</h3>
             <form method="POST" action="/encrypt" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label for="algorithm" class="form-label fw-bold">Алгоритм шифрования:</label>
-                    <select class="form-select form-select-lg" id="algorithm" name="algorithm" required>
+                    <label for="algorithm" class="form-label">Алгоритм шифрования:</label>
+                    <select class="form-select" id="algorithm" name="algorithm" required>
                         <option value="groupbox">Алгоритм: Групбокс</option>
                         <option value="algorithm2">Steganography++</option>
                         <option value="algorithm3">CipherPixel</option>
                     </select>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="key" class="form-label fw-bold">Секретный ключ (опционально):</label>
+                    <label for="key" class="form-label">Секретный ключ (опционально):</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="key" name="key" placeholder="Введите ключ для дополнительной защиты">
                     </div>
                     <small class="text-muted">Ключ не требуется для алгоритма "Групбокс"</small>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="image" class="form-label fw-bold">Исходное изображение:</label>
-                    <div class="border rounded p-4 text-center bg-light">
-                        <i class="bi bi-cloud-upload display-4 text-muted mb-2"></i>
-                        <input type="file" class="form-control" id="image" name="image" accept=".png, .jpg, .jpeg" required hidden>
-                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('image').click()">
-                            <i class="bi bi-image me-1"></i>Выбрать изображение
-                        </button>
-                        <div id="image-preview" class="mt-3"></div>
+                    <label for="image" class="form-label">Исходное изображение:</label>
+                    <div class="upload-area" onclick="document.getElementById('image').click()">
+                        <i class="bi bi-cloud-upload"></i>
+                        <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
+                        <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
+                        <input type="file" class="d-none" id="image" name="image" accept=".png, .jpg, .jpeg" required hidden>
                     </div>
+                    <div id="image-preview" class="mt-3"></div>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="message" class="form-label fw-bold">Сообщение для шифрования:</label>
-                    <textarea class="form-control form-control-lg" id="message" name="message" rows="4" 
+                    <label for="message" class="form-label">Сообщение для шифрования:</label>
+                    <textarea class="form-control" id="message" name="message" rows="4"
                               placeholder="Введите текст, который нужно скрыть в изображении" required></textarea>
                 </div>
-                
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
                         <i class="bi bi-shield-check me-2"></i>Зашифровать изображение
                     </button>
                 </div>
@@ -80,41 +80,40 @@
         </div>
 
         <!-- Форма дешифрования -->
-        <div id="decrypt-section" class="mode-section p-4 border rounded bg-white shadow-sm mt-4" 
+        <div id="decrypt-section" class="mode-section card p-3 p-md-4 mt-4"
              style="display: {% if mode == 'decrypt' %}block{% else %}none{% endif %};">
-            <h3 class="mb-4 text-center"><i class="bi bi-unlock me-2"></i>Дешифрование данных</h3>
+            <h3 class="mb-4 text-center fs-4"><i class="bi bi-unlock me-2"></i>Дешифрование данных</h3>
             <form method="POST" action="/decrypt" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label for="dec-algorithm" class="form-label fw-bold">Алгоритм дешифрования:</label>
-                    <select class="form-select form-select-lg" id="dec-algorithm" name="algorithm" required>
+                    <label for="dec-algorithm" class="form-label">Алгоритм дешифрования:</label>
+                    <select class="form-select" id="dec-algorithm" name="algorithm" required>
                         <option value="groupbox">Алгоритм: Групбокс</option>
                         <option value="algorithm2">Steganography++</option>
                         <option value="algorithm3">CipherPixel</option>
                     </select>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="dec-key" class="form-label fw-bold">Секретный ключ (если использовался):</label>
+                    <label for="dec-key" class="form-label">Секретный ключ (если использовался):</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="dec-key" name="key" placeholder="Введите ключ, если он был установлен при шифровании">
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="dec-image" class="form-label fw-bold">Зашифрованное изображение:</label>
-                    <div class="border rounded p-4 text-center bg-light">
-                        <i class="bi bi-file-earmark-image display-4 text-muted mb-2"></i>
-                        <input type="file" class="form-control" id="dec-image" name="image" accept=".png, .jpg, .jpeg" required hidden>
-                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('dec-image').click()">
-                            <i class="bi bi-image me-1"></i>Выбрать изображение
-                        </button>
-                        <div id="dec-image-preview" class="mt-3"></div>
+                    <label for="dec-image" class="form-label">Зашифрованное изображение:</label>
+                    <div class="upload-area" onclick="document.getElementById('dec-image').click()">
+                        <i class="bi bi-file-earmark-image"></i>
+                        <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
+                        <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
+                        <input type="file" class="d-none" id="dec-image" name="image" accept=".png, .jpg, .jpeg" required hidden>
                     </div>
+                    <div id="dec-image-preview" class="mt-3"></div>
                 </div>
-                
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success btn-lg">
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">
                         <i class="bi bi-file-earmark-text me-2"></i>Расшифровать данные
                     </button>
                 </div>
@@ -123,21 +122,21 @@
 
         <!-- Результаты шифрования -->
         {% if encrypted_image %}
-        <div class="result-section p-4 border rounded bg-white shadow-sm mt-4">
-            <h3 class="mb-4 text-center text-success"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
+        <div class="result-section card p-3 p-md-4 mt-4">
+            <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
             <div class="text-center">
-                <img src="image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow mb-4" style="max-height: 400px;">
-                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                <img src="data:image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow-sm mb-4" style="max-height: 350px;">
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
                     <button class="btn btn-outline-secondary" onclick="copyImage()">
                         <i class="bi bi-clipboard me-1"></i>Копировать
                     </button>
-                    <a href="image/png;base64,{{ encrypted_image }}" download="encrypted.png" 
+                    <a href="data:image/png;base64,{{ encrypted_image }}" download="encrypted.png"
                        class="btn btn-primary">
                         <i class="bi bi-download me-1"></i>Скачать результат
                     </a>
                 </div>
-                <div class="alert alert-info mt-3">
-                    <i class="bi bi-info-circle me-2"></i>Это изображение содержит зашифрованное сообщение. 
+                <div class="alert alert-info mt-3 text-start">
+                    <i class="bi bi-info-circle me-2"></i>Это изображение содержит зашифрованное сообщение.
                     Передайте его получателю вместе с информацией об алгоритме и ключе (если использовался).
                 </div>
             </div>
@@ -146,13 +145,12 @@
 
         <!-- Результаты дешифрования -->
         {% if decrypted_result %}
-        <div class="result-section p-4 border rounded bg-white shadow-sm mt-4">
-            <h3 class="mb-4 text-center text-success"><i class="bi bi-check-circle me-2"></i>Сообщение успешно расшифровано</h3>
-            <div class="form-floating mb-3">
-                <textarea class="form-control form-control-lg" rows="6" readonly>{{ decrypted_result }}</textarea>
-                <label>Результат расшифровки</label>
+        <div class="result-section card p-3 p-md-4 mt-4">
+            <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Сообщение успешно расшифровано</h3>
+            <div class="mb-3">
+                <textarea class="form-control" style="min-height: 150px;" id="decrypted-text" readonly>{{ decrypted_result }}</textarea>
             </div>
-            <div class="d-grid gap-2">
+            <div class="d-grid">
                 <button class="btn btn-outline-secondary" onclick="copyText()">
                     <i class="bi bi-clipboard me-1"></i>Копировать текст
                 </button>
@@ -171,7 +169,7 @@
         const decryptMode = document.getElementById('decrypt-mode');
         const encryptSection = document.getElementById('encrypt-section');
         const decryptSection = document.getElementById('decrypt-section');
-        
+
         function toggleSections() {
             if (encryptMode.checked) {
                 encryptSection.style.display = 'block';
@@ -181,15 +179,15 @@
                 decryptSection.style.display = 'block';
             }
         }
-        
+
         encryptMode.addEventListener('change', toggleSections);
         decryptMode.addEventListener('change', toggleSections);
-        
+
         // Предпросмотр изображений
         ['image', 'dec-image'].forEach(id => {
             const input = document.getElementById(id);
             const preview = document.getElementById(`${id}-preview`);
-            
+
             input?.addEventListener('change', function() {
                 preview.innerHTML = '';
                 if (this.files && this.files[0]) {
@@ -198,7 +196,7 @@
                         const img = document.createElement('img');
                         img.src = e.target.result;
                         img.className = 'img-fluid rounded shadow-sm mt-2';
-                        img.style.maxHeight = '200px';
+                        img.style.maxHeight = '180px';
                         preview.appendChild(img);
                     }
                     reader.readAsDataURL(this.files[0]);
@@ -206,7 +204,7 @@
             });
         });
     });
-    
+
     function copyImage() {
         const img = document.querySelector('.result-section img');
         if (img) {
@@ -215,7 +213,7 @@
             canvas.height = img.naturalHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            
+
             canvas.toBlob(blob => {
                 const item = new ClipboardItem({ 'image/png': blob });
                 navigator.clipboard.write([item]).then(() => {
@@ -226,9 +224,9 @@
             });
         }
     }
-    
+
     function copyText() {
-        const textarea = document.querySelector('textarea[readonly]');
+        const textarea = document.getElementById('decrypted-text');
         if (textarea) {
             navigator.clipboard.writeText(textarea.value).then(() => {
                 showNotification('Текст скопирован в буфер обмена!', 'success');
@@ -237,7 +235,7 @@
             });
         }
     }
-    
+
     function showNotification(message, type) {
         const toast = document.createElement('div');
         toast.className = `toast align-items-center text-bg-${type} border-0`;
@@ -250,27 +248,38 @@
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         `;
-        
-        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+
+        const toastContainer = document.querySelector('.toast-container') || createToastContainer();
         toastContainer.appendChild(toast);
-        
+
         const bsToast = new bootstrap.Toast(toast);
         bsToast.show();
-        
+
         toast.addEventListener('hidden.bs.toast', () => {
             toast.remove();
-            if (toastContainer.children.length === 0) {
+            if (toastContainer.children.length === 0 && toastContainer.classList.contains('toast-container')) {
                 toastContainer.remove();
             }
         });
     }
-    
+
     function createToastContainer() {
         const container = document.createElement('div');
-        container.id = 'toast-container';
         container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
         document.body.appendChild(container);
         return container;
     }
+
+    // Индикатор загрузки при отправке формы
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Обработка...';
+                submitBtn.disabled = true;
+            }
+        });
+    });
 </script>
 {% endblock %}
