@@ -39,9 +39,8 @@
                 <div class="mb-3">
                     <label for="algorithm" class="form-label">Алгоритм шифрования:</label>
                     <select class="form-select" id="algorithm" name="algorithm" required>
-                        <option value="groupbox">Алгоритм: Групбокс</option>
-                        <option value="algorithm2">Steganography++</option>
-                        <option value="algorithm3">CipherPixel</option>
+                        <option value="base">Базовый алгоритм</option>
+                        <option value="modified">Модифицированный алгоритм с альфа каналом</option>
                     </select>
                 </div>
 
@@ -51,18 +50,22 @@
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="key" name="key" placeholder="Введите ключ для дополнительной защиты">
                     </div>
-                    <small class="text-muted">Ключ не требуется для алгоритма "Групбокс"</small>
+                    <small class="text-muted">Ключ не требуется для выбранных алгоритмов</small>
                 </div>
 
                 <div class="mb-3">
                     <label for="image" class="form-label">Исходное изображение:</label>
-                    <div class="upload-area" onclick="document.getElementById('image').click()">
-                        <i class="bi bi-cloud-upload"></i>
-                        <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
-                        <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
-                        <input type="file" class="d-none" id="image" name="image" accept=".png, .jpg, .jpeg" required hidden>
+                    <div class="upload-area" id="encrypt-dropzone" style="cursor: pointer;">
+                        <div id="encrypt-default-view">
+                            <i class="bi bi-cloud-upload"></i>
+                            <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
+                            <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
+                        </div>
+                        <div id="encrypt-preview-view" style="display: none;">
+                            <img id="encrypt-preview-img" class="img-fluid rounded" style="max-height: 180px;">
+                        </div>
+                        <input type="file" class="d-none" id="image" name="image" accept=".png, .jpg, .jpeg" required>
                     </div>
-                    <div id="image-preview" class="mt-3"></div>
                 </div>
 
                 <div class="mb-3">
@@ -87,9 +90,8 @@
                 <div class="mb-3">
                     <label for="dec-algorithm" class="form-label">Алгоритм дешифрования:</label>
                     <select class="form-select" id="dec-algorithm" name="algorithm" required>
-                        <option value="groupbox">Алгоритм: Групбокс</option>
-                        <option value="algorithm2">Steganography++</option>
-                        <option value="algorithm3">CipherPixel</option>
+                        <option value="base">Базовый алгоритм</option>
+                        <option value="modified">Модифицированный алгоритм с альфа каналом</option>
                     </select>
                 </div>
 
@@ -99,17 +101,22 @@
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="dec-key" name="key" placeholder="Введите ключ, если он был установлен при шифровании">
                     </div>
+                    <small class="text-muted">Ключ не требуется для выбранных алгоритмов</small>
                 </div>
 
                 <div class="mb-3">
                     <label for="dec-image" class="form-label">Зашифрованное изображение:</label>
-                    <div class="upload-area" onclick="document.getElementById('dec-image').click()">
-                        <i class="bi bi-file-earmark-image"></i>
-                        <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
-                        <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
-                        <input type="file" class="d-none" id="dec-image" name="image" accept=".png, .jpg, .jpeg" required hidden>
+                    <div class="upload-area" id="decrypt-dropzone" style="cursor: pointer;">
+                        <div id="decrypt-default-view">
+                            <i class="bi bi-file-earmark-image"></i>
+                            <p class="mt-2 mb-0">Нажмите или перетащите файл сюда</p>
+                            <small class="text-muted">PNG или JPG, макс. 10 МБ</small>
+                        </div>
+                        <div id="decrypt-preview-view" style="display: none;">
+                            <img id="decrypt-preview-img" class="img-fluid rounded" style="max-height: 180px;">
+                        </div>
+                        <input type="file" class="d-none" id="dec-image" name="image" accept=".png, .jpg, .jpeg" required>
                     </div>
-                    <div id="dec-image-preview" class="mt-3"></div>
                 </div>
 
                 <div class="d-grid">
@@ -120,43 +127,42 @@
             </form>
         </div>
 
-        <!-- Результаты шифрования -->
-        {% if encrypted_image %}
-        <div class="result-section card p-3 p-md-4 mt-4">
-            <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
-            <div class="text-center">
-                <img src="data:image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow-sm mb-4" style="max-height: 350px;">
-                <div class="d-flex gap-2 justify-content-center flex-wrap">
-                    <button class="btn btn-outline-secondary" onclick="copyImage()">
-                        <i class="bi bi-clipboard me-1"></i>Копировать
-                    </button>
-                    <a href="data:image/png;base64,{{ encrypted_image }}" download="encrypted.png"
-                       class="btn btn-primary">
-                        <i class="bi bi-download me-1"></i>Скачать результат
-                    </a>
-                </div>
-                <div class="alert alert-info mt-3 text-start">
-                    <i class="bi bi-info-circle me-2"></i>Это изображение содержит зашифрованное сообщение.
-                    Передайте его получателю вместе с информацией об алгоритме и ключе (если использовался).
+        <!-- Контейнеры для результатов -->
+        <div id="encrypt-result-container" class="result-container" style="display: {% if encrypted_image %}block{% else %}none{% endif %};">
+            <div class="result-section card p-3 p-md-4 mt-4">
+                <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
+                <div class="text-center">
+                    <img src="data:image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow-sm mb-4" style="max-height: 350px;">
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        <button class="btn btn-outline-secondary" onclick="copyImage()">
+                            <i class="bi bi-clipboard me-1"></i>Копировать
+                        </button>
+                        <a href="data:image/png;base64,{{ encrypted_image }}" download="encrypted.png"
+                           class="btn btn-primary">
+                            <i class="bi bi-download me-1"></i>Скачать результат
+                        </a>
+                    </div>
+                    <div class="alert alert-info mt-3 text-start">
+                        <i class="bi bi-info-circle me-2"></i>Это изображение содержит зашифрованное сообщение.
+                        Передайте его получателю вместе с информацией об алгоритме, который использовался.
+                    </div>
                 </div>
             </div>
         </div>
-        {% endif %}
 
-        <!-- Результаты дешифрования -->
-        {% if decrypted_result %}
-        <div class="result-section card p-3 p-md-4 mt-4">
-            <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Сообщение успешно расшифровано</h3>
-            <div class="mb-3">
-                <textarea class="form-control" style="min-height: 150px;" id="decrypted-text" readonly>{{ decrypted_result }}</textarea>
-            </div>
-            <div class="d-grid">
-                <button class="btn btn-outline-secondary" onclick="copyText()">
-                    <i class="bi bi-clipboard me-1"></i>Копировать текст
-                </button>
+        <div id="decrypt-result-container" class="result-container" style="display: {% if decrypted_result %}block{% else %}none{% endif %};">
+            <div class="result-section card p-3 p-md-4 mt-4">
+                <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Сообщение успешно расшифровано</h3>
+                <div class="mb-3">
+                    <textarea class="form-control" style="min-height: 150px;" id="decrypted-text" readonly>{{ decrypted_result }}</textarea>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-outline-secondary" onclick="copyText()">
+                        <i class="bi bi-clipboard me-1"></i>Копировать текст
+                    </button>
+                </div>
             </div>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -164,56 +170,131 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Переключение режимов
+        // ---- Переключение режимов и очистка результатов ----
         const encryptMode = document.getElementById('encrypt-mode');
         const decryptMode = document.getElementById('decrypt-mode');
         const encryptSection = document.getElementById('encrypt-section');
         const decryptSection = document.getElementById('decrypt-section');
+        const encryptResultContainer = document.getElementById('encrypt-result-container');
+        const decryptResultContainer = document.getElementById('decrypt-result-container');
+
+        function clearResults() {
+            if (encryptResultContainer) encryptResultContainer.style.display = 'none';
+            if (decryptResultContainer) decryptResultContainer.style.display = 'none';
+            const alerts = document.querySelectorAll('.alert:not(.alert-info)');
+            alerts.forEach(alert => alert.remove());
+        }
 
         function toggleSections() {
             if (encryptMode.checked) {
                 encryptSection.style.display = 'block';
                 decryptSection.style.display = 'none';
+                clearResults();
             } else if (decryptMode.checked) {
                 encryptSection.style.display = 'none';
                 decryptSection.style.display = 'block';
+                clearResults();
             }
         }
 
         encryptMode.addEventListener('change', toggleSections);
         decryptMode.addEventListener('change', toggleSections);
 
-        // Предпросмотр изображений
-        ['image', 'dec-image'].forEach(id => {
-            const input = document.getElementById(id);
-            const preview = document.getElementById(`${id}-preview`);
+        // ---- Drag & Drop + Preview внутри области ----
+        function setupUpload(inputId, defaultViewId, previewViewId, previewImgId, dropzoneId) {
+            const input = document.getElementById(inputId);
+            const defaultView = document.getElementById(defaultViewId);
+            const previewView = document.getElementById(previewViewId);
+            const previewImg = document.getElementById(previewImgId);
+            const dropzone = document.getElementById(dropzoneId);
 
-            input?.addEventListener('change', function() {
-                preview.innerHTML = '';
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.className = 'img-fluid rounded shadow-sm mt-2';
-                        img.style.maxHeight = '180px';
-                        preview.appendChild(img);
-                    }
-                    reader.readAsDataURL(this.files[0]);
+            if (!input || !defaultView || !previewView || !previewImg || !dropzone) return;
+
+            // Функция отображения превью
+            function showPreview(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    defaultView.style.display = 'none';
+                    previewView.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Функция сброса к исходному состоянию (без файла)
+            function resetToDefault() {
+                defaultView.style.display = 'block';
+                previewView.style.display = 'none';
+                previewImg.src = '';
+                input.value = ''; // очищаем input
+            }
+
+            // Обработка выбора файла
+            function handleFile(file) {
+                if (!file) return;
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+                if (!validTypes.includes(file.type)) {
+                    showNotification('Пожалуйста, загрузите изображение в формате PNG или JPG.', 'danger');
+                    resetToDefault();
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification('Размер файла не должен превышать 10 МБ.', 'danger');
+                    resetToDefault();
+                    return;
+                }
+                showPreview(file);
+            }
+
+            // Событие клика по зоне загрузки
+            dropzone.addEventListener('click', (e) => {
+                e.stopPropagation();
+                input.click();
+            });
+
+            // Обработка изменения input (выбор файла)
+            input.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    handleFile(this.files[0]);
+                } else {
+                    // Если файл не выбран, сохраняем предыдущее состояние
+                    // (ничего не делаем, остаётся как было)
                 }
             });
-        });
+
+            // Drag & Drop
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-primary');
+            });
+            dropzone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-primary');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-primary');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    input.files = e.dataTransfer.files;
+                    handleFile(file);
+                }
+            });
+        }
+
+        setupUpload('image', 'encrypt-default-view', 'encrypt-preview-view', 'encrypt-preview-img', 'encrypt-dropzone');
+        setupUpload('dec-image', 'decrypt-default-view', 'decrypt-preview-view', 'decrypt-preview-img', 'decrypt-dropzone');
     });
 
+    // ---- Функции копирования и уведомлений ----
     function copyImage() {
-        const img = document.querySelector('.result-section img');
+        const img = document.querySelector('#encrypt-result-container img');
         if (img) {
             const canvas = document.createElement('canvas');
             canvas.width = img.naturalWidth;
             canvas.height = img.naturalHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-
             canvas.toBlob(blob => {
                 const item = new ClipboardItem({ 'image/png': blob });
                 navigator.clipboard.write([item]).then(() => {
@@ -248,13 +329,10 @@
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         `;
-
         const toastContainer = document.querySelector('.toast-container') || createToastContainer();
         toastContainer.appendChild(toast);
-
         const bsToast = new bootstrap.Toast(toast);
         bsToast.show();
-
         toast.addEventListener('hidden.bs.toast', () => {
             toast.remove();
             if (toastContainer.children.length === 0 && toastContainer.classList.contains('toast-container')) {
@@ -275,7 +353,6 @@
         form.addEventListener('submit', function() {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn && !submitBtn.disabled) {
-                const originalText = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Обработка...';
                 submitBtn.disabled = true;
             }
