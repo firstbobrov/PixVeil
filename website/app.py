@@ -9,16 +9,13 @@ from encryption_utils import (
 
 app = Flask(__name__)
 
-# Используем переменные окружения для секретного ключа
 app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')
 
-# Используем /data для постоянного хранения файлов (Amvera persistence)
 BASE_DIR = '/data' if os.path.exists('/data') else os.getcwd()
 app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
 app.config['RESULT_FOLDER'] = os.path.join(BASE_DIR, 'results')
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
 
-# Создаем папки
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
 
@@ -26,19 +23,22 @@ os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
 @app.route('/')
 def index():
     encrypt_result_id = request.args.get('encrypt_result')
+    encrypt_info = session.pop('encrypt_info', None)
+    mode = request.args.get('mode', 'encrypt')
+
     if encrypt_result_id:
         result_path = os.path.join(app.config['RESULT_FOLDER'], f'{encrypt_result_id}.png')
         if os.path.exists(result_path):
             with open(result_path, 'rb') as f:
                 b64_string = base64.b64encode(f.read()).decode('utf-8')
             os.remove(result_path)
-            return render_template('index.html', encrypted_image=b64_string, mode='encrypt')
+            return render_template('index.html', encrypted_image=b64_string, mode='encrypt', encrypt_info=encrypt_info)
 
     decrypt_result = session.pop('decrypt_result', None)
     if decrypt_result:
         return render_template('index.html', decrypted_result=decrypt_result, mode='decrypt')
 
-    return render_template('index.html')
+    return render_template('index.html', mode=mode)
 
 
 @app.route('/guide')
@@ -70,30 +70,51 @@ def encrypt():
     output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{uid}_output.png')
     image.save(input_path)
 
-    # Проверка максимальной длины сообщения
-    max_len = 0
+    # Получаем максимальную ёмкость (для информации)
     if algorithm == 'base':
         max_len = base_max_message_length(input_path)
     elif algorithm == 'modified':
         max_len = modified_max_message_length(input_path)
-
-    if max_len > 0 and len(message) > max_len:
-        flash(f'Сообщение слишком длинное. Максимальная длина для выбранного алгоритма и этого изображения: {max_len} символов.', 'warning')
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        return redirect(url_for('index'))
+    else:
+        max_len = 0
 
     try:
         if algorithm == 'base':
             success, written = base_encrypt(input_path, output_path, message)
+            # written = количество записанных байт сообщения
+            message_bytes = message.encode('utf-8')
+            written_symbols = len(message_bytes[:written].decode('utf-8', errors='ignore'))
+            unit = 'байт'
+            written_units = written
+            max_len_display = max_len
         elif algorithm == 'modified':
             success, written = modified_encrypt(input_path, output_path, message)
+            # written = количество записанных символов (из SYMBOLS)
+            written_symbols = written
+            unit = 'символов'
+            written_units = written
+            max_len_display = max_len
         else:
             flash('Неизвестный алгоритм', 'danger')
             return redirect(url_for('index'))
 
+        total_symbols = len(message)
+
+        encrypt_info = {
+            'success': success,
+            'written_symbols': written_symbols,
+            'total_symbols': total_symbols,
+            'written_units': written_units,
+            'unit': unit,
+            'max_len': max_len_display,
+            'algorithm': 'Базовый' if algorithm == 'base' else 'Модифицированный'
+        }
+        session['encrypt_info'] = encrypt_info
+
         if not success:
-            flash(f'Не удалось зашифровать всё сообщение. Зашифровано только {written} из {len(message)} символов. Попробуйте использовать изображение большего размера.', 'warning')
+            flash(
+                f'Не удалось зашифровать всё сообщение. Зашифровано только {written_symbols} из {total_symbols} символов. Попробуйте использовать изображение большего размера.',
+                'warning')
         else:
             flash('Изображение успешно зашифровано!', 'success')
 
@@ -145,9 +166,9 @@ def decrypt():
         if not result:
             raise Exception('Не удалось извлечь сообщение из изображения')
 
-        session['decrypt_result'] = result
+        # Вместо session – рендерим шаблон с результатом
         flash('Сообщение успешно расшифровано!', 'success')
-        return redirect(url_for('index'))
+        return render_template('index.html', decrypted_result=result, mode='decrypt')
 
     except Exception as e:
         flash(f'Ошибка при дешифровании: {str(e)}', 'danger')
@@ -163,11 +184,8 @@ def decrypt():
 
 @app.route('/health')
 def health():
-    """Health check endpoint for Amvera"""
     return {'status': 'ok'}, 200
 
 
-# Для локального запуска (на Amvera не используется)
 if __name__ == '__main__':
-    # На Amvera используется Gunicorn, этот блок игнорируется
-    app.run(host='0.0.0.0', port=80, debug=False)
+    app.run(host='0.0.0.0', port=80, debug=True)

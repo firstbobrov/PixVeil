@@ -127,7 +127,7 @@
             </form>
         </div>
 
-        <!-- Контейнеры для результатов -->
+        <!-- Контейнер для результатов шифрования -->
         <div id="encrypt-result-container" class="result-container" style="display: {% if encrypted_image %}block{% else %}none{% endif %};">
             <div class="result-section card p-3 p-md-4 mt-4">
                 <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
@@ -146,10 +146,43 @@
                         <i class="bi bi-info-circle me-2"></i>Это изображение содержит зашифрованное сообщение.
                         Передайте его получателю вместе с информацией об алгоритме, который использовался.
                     </div>
+
+                    <!-- Блок статистики шифрования -->
+                    {% if encrypt_info %}
+                    <div class="alert alert-{{ 'success' if encrypt_info.success else 'warning' }} mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% if encrypt_info.success %}
+                            ✅ Сообщение успешно зашифровано полностью!
+                        {% else %}
+                            ⚠️ Сообщение зашифровано не полностью. Записано {{ encrypt_info.written_symbols }} из {{ encrypt_info.total_symbols }} символов.
+                        {% endif %}
+                    </div>
+                    <div class="encrypt-stats mb-3">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Исходное сообщение
+                                <span class="badge bg-secondary rounded-pill">{{ encrypt_info.total_symbols }} симв.</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Зашифровано символов
+                                <span class="badge bg-primary rounded-pill">{{ encrypt_info.written_symbols }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Использовано {{ encrypt_info.unit }}
+                                <span class="badge bg-info rounded-pill">{{ encrypt_info.written_units }} / {{ encrypt_info.max_len }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Алгоритм
+                                <span class="badge bg-dark rounded-pill">{{ encrypt_info.algorithm }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
+        <!-- Контейнер для результатов дешифрования -->
         <div id="decrypt-result-container" class="result-container" style="display: {% if decrypted_result %}block{% else %}none{% endif %};">
             <div class="result-section card p-3 p-md-4 mt-4">
                 <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Сообщение успешно расшифровано</h3>
@@ -190,10 +223,18 @@
                 encryptSection.style.display = 'block';
                 decryptSection.style.display = 'none';
                 clearResults();
+                // Обновляем URL без параметра mode
+                const url = new URL(window.location.href);
+                url.searchParams.delete('mode');
+                window.history.replaceState({}, '', url);
             } else if (decryptMode.checked) {
                 encryptSection.style.display = 'none';
                 decryptSection.style.display = 'block';
                 clearResults();
+                // Обновляем URL с параметром mode=decrypt
+                const url = new URL(window.location.href);
+                url.searchParams.set('mode', 'decrypt');
+                window.history.replaceState({}, '', url);
             }
         }
 
@@ -210,7 +251,6 @@
 
             if (!input || !defaultView || !previewView || !previewImg || !dropzone) return;
 
-            // Функция отображения превью
             function showPreview(file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -221,15 +261,13 @@
                 reader.readAsDataURL(file);
             }
 
-            // Функция сброса к исходному состоянию (без файла)
             function resetToDefault() {
                 defaultView.style.display = 'block';
                 previewView.style.display = 'none';
                 previewImg.src = '';
-                input.value = ''; // очищаем input
+                input.value = '';
             }
 
-            // Обработка выбора файла
             function handleFile(file) {
                 if (!file) return;
                 const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
@@ -246,23 +284,17 @@
                 showPreview(file);
             }
 
-            // Событие клика по зоне загрузки
             dropzone.addEventListener('click', (e) => {
                 e.stopPropagation();
                 input.click();
             });
 
-            // Обработка изменения input (выбор файла)
             input.addEventListener('change', function() {
                 if (this.files && this.files.length > 0) {
                     handleFile(this.files[0]);
-                } else {
-                    // Если файл не выбран, сохраняем предыдущее состояние
-                    // (ничего не делаем, остаётся как было)
                 }
             });
 
-            // Drag & Drop
             dropzone.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 dropzone.classList.add('border-primary');
@@ -286,7 +318,6 @@
         setupUpload('dec-image', 'decrypt-default-view', 'decrypt-preview-view', 'decrypt-preview-img', 'decrypt-dropzone');
     });
 
-    // ---- Функции копирования и уведомлений ----
     function copyImage() {
         const img = document.querySelector('#encrypt-result-container img');
         if (img) {
@@ -308,12 +339,14 @@
 
     function copyText() {
         const textarea = document.getElementById('decrypted-text');
-        if (textarea) {
+        if (textarea && textarea.value) {
             navigator.clipboard.writeText(textarea.value).then(() => {
                 showNotification('Текст скопирован в буфер обмена!', 'success');
             }).catch(err => {
                 showNotification('Ошибка копирования: ' + err, 'danger');
             });
+        } else {
+            showNotification('Нет текста для копирования', 'warning');
         }
     }
 
@@ -348,7 +381,6 @@
         return container;
     }
 
-    // Индикатор загрузки при отправке формы
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function() {
             const submitBtn = this.querySelector('button[type="submit"]');
