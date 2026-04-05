@@ -8,11 +8,17 @@ from encryption_utils import (
 )
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Замените на надёжный ключ в продакшене
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
-app.config['RESULT_FOLDER'] = 'results'
 
+# Используем переменные окружения для секретного ключа
+app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')
+
+# Используем /data для постоянного хранения файлов (Amvera persistence)
+BASE_DIR = '/data' if os.path.exists('/data') else os.getcwd()
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
+app.config['RESULT_FOLDER'] = os.path.join(BASE_DIR, 'results')
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
+# Создаем папки
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
 
@@ -155,5 +161,13 @@ def decrypt():
                 pass
 
 
+@app.route('/health')
+def health():
+    """Health check endpoint for Amvera"""
+    return {'status': 'ok'}, 200
+
+
+# Для локального запуска (на Amvera не используется)
 if __name__ == '__main__':
-    app.run(debug=True)
+    # На Amvera используется Gunicorn, этот блок игнорируется
+    app.run(host='0.0.0.0', port=80, debug=False)
