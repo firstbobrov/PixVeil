@@ -40,7 +40,7 @@
                     <label for="algorithm" class="form-label">Алгоритм шифрования:</label>
                     <select class="form-select" id="algorithm" name="algorithm" required>
                         <option value="base">Базовый алгоритм</option>
-                        <option value="modified">Модифицированный алгоритм с альфа каналом</option>
+                        <option value="modified">Модифицированный алгоритм</option>
                     </select>
                 </div>
 
@@ -90,7 +90,7 @@
                     <label for="dec-algorithm" class="form-label">Алгоритм дешифрования:</label>
                     <select class="form-select" id="dec-algorithm" name="algorithm" required>
                         <option value="base">Базовый алгоритм</option>
-                        <option value="modified">Модифицированный алгоритм с альфа каналом</option>
+                        <option value="modified">Модифицированный алгоритм</option>
                     </select>
                 </div>
 
@@ -159,11 +159,11 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Исходное сообщение
-                                <span class="badge bg-secondary rounded-pill">{{ encrypt_info.total_symbols }} симв.</span>
+                                <span class="badge bg-secondary rounded-pill">{{ encrypt_info.total_symbols }} символов</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Зашифровано символов
-                                <span class="badge bg-primary rounded-pill">{{ encrypt_info.written_symbols }}</span>
+                                Зашифровано
+                                <span class="badge bg-primary rounded-pill">{{ encrypt_info.written_symbols }} символов</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Алгоритм

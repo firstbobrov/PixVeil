@@ -41,12 +41,6 @@
                             <span>Дополнительная защита с помощью секретных ключей</span>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-start">
-                            <i class="bi bi-check-circle text-success me-2 fs-5"></i>
-                            <span>Простой и интуитивно понятный интерфейс</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -65,7 +59,7 @@
                     </div>
                     <div class="col-md-10">
                         <h3 class="h6 fw-bold">Выберите режим и алгоритм</h3>
-                        <p class="text-muted small mb-0">Переключитесь в режим шифрования и выберите подходящий алгоритм из списка. Для большинства случаев подойдет алгоритм "Групбокс".</p>
+                        <p class="text-muted small mb-0">Переключитесь в режим шифрования и выберите подходящий алгоритм из списка. Для большинства случаев подойдет алгоритм "Базовый".</p>
                     </div>
                 </div>
                 <div class="row align-items-center mb-4">
@@ -86,6 +80,17 @@
                         </span>
                     </div>
                     <div class="col-md-10">
+                        <h3 class="h6 fw-bold">Укажите секретный ключ (опционально)</h3>
+                        <p class="text-muted small mb-0">Если хотите усилить защиту, введите секретный ключ. При дешифровании потребуется указать этот же ключ.</p>
+                    </div>
+                </div>
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-2 text-center mb-3 mb-md-0">
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary p-3 rounded-circle">
+                            <i class="bi bi-4-circle fs-2"></i>
+                        </span>
+                    </div>
+                    <div class="col-md-10">
                         <h3 class="h6 fw-bold">Введите сообщение</h3>
                         <p class="text-muted small mb-0">Напишите текст, который нужно зашифровать. Максимальная длина зависит от размера изображения и выбранного алгоритма.</p>
                     </div>
@@ -93,7 +98,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-2 text-center mb-3 mb-md-0">
                         <span class="badge bg-secondary bg-opacity-10 text-secondary p-3 rounded-circle">
-                            <i class="bi bi-4-circle fs-2"></i>
+                            <i class="bi bi-5-circle fs-2"></i>
                         </span>
                     </div>
                     <div class="col-md-10">
@@ -140,7 +145,7 @@
                     </div>
                     <div class="col-md-10">
                         <h3 class="h6 fw-bold">Укажите ключ (если требуется)</h3>
-                        <p class="text-muted small mb-0">Если при шифровании использовался секретный ключ, введите его в соответствующее поле. Для алгоритма "Групбокс" ключ не требуется.</p>
+                        <p class="text-muted small mb-0">Если при шифровании использовался секретный ключ, введите его в соответствующее поле.</p>
                     </div>
                 </div>
                 <div class="row align-items-center">
@@ -153,6 +158,43 @@
                         <h3 class="h6 fw-bold">Получите сообщение</h3>
                         <p class="text-muted small mb-0">После обработки вы увидите исходное сообщение, которое было зашифровано в изображении.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сравнение алгоритмов -->
+        <div class="card mb-4">
+            <div class="card-header bg-white border-bottom">
+                <h2 class="h5 mb-0"><i class="bi bi-diagram-3 me-2" style="color: var(--primary);"></i>Какой алгоритм выбрать?</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="border rounded-3 p-3 h-100 bg-white">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-lightning-charge me-2 text-primary"></i>
+                                <strong class="fw-semibold">Базовый</strong>
+                            </div>
+                            <p class="small text-muted mb-1">✓ Быстрое шифрование</p>
+                            <p class="small text-muted mb-1">✓ Размер файла почти не меняется</p>
+                            <p class="small text-muted mb-0">✓ Для коротких сообщений</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-3 h-100 bg-white">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-cpu me-2 text-success"></i>
+                                <strong class="fw-semibold">Модифицированный</strong>
+                            </div>
+                            <p class="small text-muted mb-1">✓ Намного больше вместимости</p>
+                            <p class="small text-muted mb-1">⚠ Шифрование дольше, файл тяжелее</p>
+                            <p class="small text-muted mb-0">✓ Идеален для длинных текстов</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-light border mt-3 mb-0 py-2 px-3 small">
+                    <i class="bi bi-info-circle me-1 text-secondary"></i>
+                    <span class="text-secondary">Совет: для коротких заметок — базовый алгоритм, для длинных сообщений — модифицированный.</span>
                 </div>
             </div>
         </div>
@@ -186,12 +228,6 @@
                         <div class="d-flex align-items-start">
                             <i class="bi bi-cloud-download text-warning me-2"></i>
                             <span class="small">Всегда сохраняйте оригинальное изображение перед шифрованием</span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex align-items-start">
-                            <i class="bi bi-shield-check text-warning me-2"></i>
-                            <span class="small">Для максимальной безопасности используйте разные алгоритмы для разных сообщений</span>
                         </div>
                     </div>
                 </div>
