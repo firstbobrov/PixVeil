@@ -21,7 +21,14 @@ os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
 
 
 @app.route('/')
-def index():
+def landing():
+    """Новая главная страница-лендинг"""
+    return render_template('landing.html')
+
+
+@app.route('/tool')
+def tool():
+    """Страница инструмента (шифрование/дешифрование)"""
     encrypt_result_id = request.args.get('encrypt_result')
     encrypt_info = session.pop('encrypt_info', None)
     mode = request.args.get('mode', 'encrypt')
@@ -32,13 +39,13 @@ def index():
             with open(result_path, 'rb') as f:
                 b64_string = base64.b64encode(f.read()).decode('utf-8')
             os.remove(result_path)
-            return render_template('index.html', encrypted_image=b64_string, mode='encrypt', encrypt_info=encrypt_info)
+            return render_template('tool.html', encrypted_image=b64_string, mode='encrypt', encrypt_info=encrypt_info)
 
     decrypt_result = session.pop('decrypt_result', None)
     if decrypt_result:
-        return render_template('index.html', decrypted_result=decrypt_result, mode='decrypt')
+        return render_template('tool.html', decrypted_result=decrypt_result, mode='decrypt')
 
-    return render_template('index.html', mode=mode)
+    return render_template('tool.html', mode=mode)
 
 
 @app.route('/guide')
@@ -54,17 +61,17 @@ def encrypt():
 
     if not image or image.filename == '':
         flash('Не выбран файл изображения', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     if not message:
         flash('Введите сообщение для шифрования', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     uid = uuid.uuid4().hex
     input_ext = os.path.splitext(image.filename)[1]
     if input_ext.lower() not in ['.png', '.jpg', '.jpeg']:
         flash('Поддерживаются только форматы PNG и JPG', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{uid}_input{input_ext}')
     output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{uid}_output.png')
@@ -96,7 +103,7 @@ def encrypt():
             max_len_display = max_len
         else:
             flash('Неизвестный алгоритм', 'danger')
-            return redirect(url_for('index'))
+            return redirect(url_for('tool'))
 
         total_symbols = len(message)
 
@@ -121,11 +128,11 @@ def encrypt():
         result_id = uuid.uuid4().hex
         result_path = os.path.join(app.config['RESULT_FOLDER'], f'{result_id}.png')
         os.rename(output_path, result_path)
-        return redirect(url_for('index', encrypt_result=result_id))
+        return redirect(url_for('tool', encrypt_result=result_id))
 
     except Exception as e:
         flash(f'Ошибка при шифровании: {str(e)}', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     finally:
         for path in [input_path, output_path]:
@@ -143,13 +150,13 @@ def decrypt():
 
     if not image or image.filename == '':
         flash('Не выбран файл изображения', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     uid = uuid.uuid4().hex
     input_ext = os.path.splitext(image.filename)[1]
     if input_ext.lower() not in ['.png', '.jpg', '.jpeg']:
         flash('Поддерживаются только форматы PNG и JPG', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     input_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{uid}_input{input_ext}')
     image.save(input_path)
@@ -161,18 +168,17 @@ def decrypt():
             result = modified_decrypt(input_path)
         else:
             flash('Неизвестный алгоритм', 'danger')
-            return redirect(url_for('index'))
+            return redirect(url_for('tool'))
 
         if not result:
             raise Exception('Не удалось извлечь сообщение из изображения')
 
-        # Вместо session – рендерим шаблон с результатом
         flash('Сообщение успешно расшифровано!', 'success')
-        return render_template('index.html', decrypted_result=result, mode='decrypt')
+        return render_template('tool.html', decrypted_result=result, mode='decrypt')
 
     except Exception as e:
         flash(f'Ошибка при дешифровании: {str(e)}', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('tool'))
 
     finally:
         if os.path.exists(input_path):

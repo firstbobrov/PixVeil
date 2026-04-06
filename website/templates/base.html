@@ -34,9 +34,8 @@
             background: var(--light-bg);
             color: #1e293b;
             line-height: 1.5;
-            padding-top: var(--navbar-height); /* чтобы контент не прятался под шапкой */
+            padding-top: var(--navbar-height);
         }
-        /* Навбар с фиксацией через fixed */
         .navbar {
             position: fixed;
             top: 0;
@@ -72,7 +71,6 @@
             box-shadow: none;
             outline: 1px solid var(--primary);
         }
-        /* Десктопное меню */
         .navbar-nav {
             display: flex;
             flex-direction: row;
@@ -93,7 +91,6 @@
         .navbar-nav .nav-link i {
             margin-right: 0.5rem;
         }
-        /* Offcanvas (только на мобильных) */
         .offcanvas {
             border-left: 1px solid var(--border-color);
             --bs-offcanvas-width: 280px;
@@ -136,7 +133,6 @@
             display: inline-block;
             text-align: center;
         }
-        /* Основной контент */
         .main-content {
             min-height: 80vh;
             padding: 3rem 0;
@@ -149,7 +145,6 @@
                 padding: 2rem 0;
             }
         }
-        /* Карточки */
         .card {
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -170,7 +165,6 @@
         .card-body {
             padding: 1.5rem;
         }
-        /* Кнопки */
         .btn {
             border-radius: 30px;
             padding: 0.5rem 1.5rem;
@@ -207,7 +201,6 @@
             border-color: var(--border-color);
             color: var(--primary);
         }
-        /* Формы */
         .form-control, .form-select {
             border-radius: 12px;
             border: 1px solid var(--border-color);
@@ -230,7 +223,6 @@
             border: 1px solid var(--border-color);
             border-radius: 12px 0 0 12px;
         }
-        /* Область загрузки */
         .upload-area {
             border: 2px dashed var(--border-color);
             border-radius: 20px;
@@ -258,7 +250,6 @@
         .upload-area small {
             color: var(--text-muted);
         }
-        /* Адаптивность шрифтов */
         @media (max-width: 576px) {
             h1.fw-bold {
                 font-size: 2rem;
@@ -280,7 +271,6 @@
                 font-size: 2rem;
             }
         }
-        /* Футер */
         footer {
             border-top: 1px solid var(--border-color);
             background: white !important;
@@ -293,7 +283,6 @@
         footer a:hover {
             color: var(--primary);
         }
-        /* Уведомления */
         .toast-container {
             z-index: 1100;
         }
@@ -306,28 +295,30 @@
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
-    <!-- Навбар (фиксированный сверху) -->
     <nav class="navbar">
         <div class="container">
             <div class="row justify-content-center w-100">
                 <div class="col-lg-8">
                     <div class="d-flex justify-content-between align-items-center">
-                        <a class="navbar-brand" href="{{ url_for('index') }}">
+                        <a class="navbar-brand" href="{{ url_for('landing') }}">
                             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="PixVeil">
                             <span>PixVeil</span>
                         </a>
 
-                        <!-- Кнопка бургера: видна только на экранах меньше lg -->
                         <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
                             <span class="navbar-toggler-icon"></span>
                         </button>
 
-                        <!-- Десктопное меню: скрыто на экранах меньше lg -->
                         <div class="d-none d-lg-block">
                             <ul class="navbar-nav flex-row">
                                 <li class="nav-item">
-                                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
+                                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('landing') }}">
                                         <i class="bi bi-house-door"></i>Главная
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.path == '/tool' %}active{% endif %}" href="{{ url_for('tool') }}">
+                                        <i class="bi bi-shield-lock"></i>Инструмент
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -343,7 +334,6 @@
         </div>
     </nav>
 
-    <!-- Offcanvas меню (только для мобильных) -->
     <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="offcanvasNavbar">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title">Меню</h5>
@@ -352,8 +342,13 @@
         <div class="offcanvas-body">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}" data-bs-dismiss="offcanvas">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('landing') }}" data-bs-dismiss="offcanvas">
                         <i class="bi bi-house-door"></i>Главная
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/tool' %}active{% endif %}" href="{{ url_for('tool') }}" data-bs-dismiss="offcanvas">
+                        <i class="bi bi-shield-lock"></i>Инструмент
                     </a>
                 </li>
                 <li class="nav-item">
@@ -365,9 +360,7 @@
         </div>
     </div>
 
-    <!-- Основной контент -->
     <div class="container main-content">
-        <!-- Flash сообщения -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -382,7 +375,6 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Футер -->
     <footer class="py-4">
         <div class="container text-center">
             <p class="mb-0">&copy; 2026 PixVeil. Все права защищены.</p>
@@ -395,7 +387,6 @@
         </div>
     </footer>
 
-    <!-- Контейнер для toast-уведомлений -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -50,7 +50,6 @@
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="key" name="key" placeholder="Введите ключ для дополнительной защиты">
                     </div>
-                    <small class="text-muted">Ключ не требуется для выбранных алгоритмов</small>
                 </div>
 
                 <div class="mb-3">
@@ -101,7 +100,6 @@
                         <span class="input-group-text"><i class="bi bi-key"></i></span>
                         <input type="text" class="form-control" id="dec-key" name="key" placeholder="Введите ключ, если он был установлен при шифровании">
                     </div>
-                    <small class="text-muted">Ключ не требуется для выбранных алгоритмов</small>
                 </div>
 
                 <div class="mb-3">
@@ -132,7 +130,7 @@
             <div class="result-section card p-3 p-md-4 mt-4">
                 <h3 class="mb-4 text-center text-success fs-4"><i class="bi bi-check-circle me-2"></i>Операция успешно выполнена</h3>
                 <div class="text-center">
-                    <img src="data:image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow-sm mb-4" style="max-height: 350px;">
+                    <img src="data:image/png;base64,{{ encrypted_image }}" class="img-fluid border rounded shadow-sm mb-4" style="max-height: 350px;" id="result-image">
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
                         <button class="btn btn-outline-secondary" onclick="copyImage()">
                             <i class="bi bi-clipboard me-1"></i>Копировать
@@ -166,10 +164,6 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Зашифровано символов
                                 <span class="badge bg-primary rounded-pill">{{ encrypt_info.written_symbols }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Использовано {{ encrypt_info.unit }}
-                                <span class="badge bg-info rounded-pill">{{ encrypt_info.written_units }} / {{ encrypt_info.max_len }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Алгоритм
@@ -223,7 +217,6 @@
                 encryptSection.style.display = 'block';
                 decryptSection.style.display = 'none';
                 clearResults();
-                // Обновляем URL без параметра mode
                 const url = new URL(window.location.href);
                 url.searchParams.delete('mode');
                 window.history.replaceState({}, '', url);
@@ -231,7 +224,6 @@
                 encryptSection.style.display = 'none';
                 decryptSection.style.display = 'block';
                 clearResults();
-                // Обновляем URL с параметром mode=decrypt
                 const url = new URL(window.location.href);
                 url.searchParams.set('mode', 'decrypt');
                 window.history.replaceState({}, '', url);
@@ -318,23 +310,44 @@
         setupUpload('dec-image', 'decrypt-default-view', 'decrypt-preview-view', 'decrypt-preview-img', 'decrypt-dropzone');
     });
 
+    // Исправленная функция копирования изображения
     function copyImage() {
         const img = document.querySelector('#encrypt-result-container img');
-        if (img) {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            canvas.toBlob(blob => {
+        if (!img) {
+            showNotification('Изображение не найдено', 'warning');
+            return;
+        }
+
+        // Если изображение ещё не загружено, ждём
+        if (!img.complete) {
+            img.onload = () => copyImage();
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob(blob => {
+            if (!blob) {
+                showNotification('Не удалось подготовить изображение для копирования', 'danger');
+                return;
+            }
+            try {
                 const item = new ClipboardItem({ 'image/png': blob });
                 navigator.clipboard.write([item]).then(() => {
                     showNotification('Изображение скопировано в буфер обмена!', 'success');
                 }).catch(err => {
-                    showNotification('Ошибка копирования: ' + err, 'danger');
+                    console.error('Clipboard write failed:', err);
+                    showNotification('Не удалось скопировать изображение. Возможно, браузер не поддерживает эту функцию.', 'warning');
                 });
-            });
-        }
+            } catch (e) {
+                console.error('ClipboardItem error:', e);
+                showNotification('Ваш браузер не поддерживает копирование изображений. Попробуйте скачать файл.', 'warning');
+            }
+        }, 'image/png');
     }
 
     function copyText() {
