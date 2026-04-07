@@ -8,6 +8,6 @@ build:
   requirementsPath: requirements.txt
 
 run:
-  command: gunicorn -b 0.0.0.0:80 --timeout 120 --workers 1 --max-requests 10 app:app
+  command: gunicorn -b 0.0.0.0:80 --timeout 120 --workers 7 --max-requests 10 app:app
   persistenceMount: /data
   containerPort: 80
